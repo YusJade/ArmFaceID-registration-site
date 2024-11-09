@@ -17,8 +17,7 @@
       </el-upload>
     </el-form-item>
     <el-form-item>
-      <el-button style="margin: 0 auto;" type="primary"
-                 native-type="submit">注册</el-button>
+      <el-button style="margin: 0 auto;" type="primary" @click="register">注册</el-button>
     </el-form-item>
   </el-form>
   <el-button style="margin: 0 auto;" type="success" @click="testRPC">点我发送一个 rpc
@@ -29,7 +28,7 @@
 <script setup lang="ts">
 import { defineComponent, ref, reactive } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
-import FaceRpc, { RecognitionResponse } from '@/client/client'
+import FaceRpc, { RecognitionResponse, RegistrationRequest } from '@/client/client'
 import { UserInfo, RecognitionRequest } from '@/client/client'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
@@ -74,10 +73,9 @@ const getUint8Array = (fileRaw: File) => {
 
 
 const getBase64 = (fileRaw: File) => {
-  return new Promise(function (resolve, reject) {
+  return new Promise(function (resolve: (base64: string) => void, reject) {
     const reader = new FileReader()
     let imgResult = ''
-    reader.readAsDataURL(fileRaw)
     reader.onload = function () {
       imgResult = reader.result as string
     }
@@ -87,9 +85,26 @@ const getBase64 = (fileRaw: File) => {
     reader.onloadend = function () {
       resolve(imgResult)
     }
+    reader.readAsDataURL(fileRaw)
   })
 }
 
+const register = () => {
+  getBase64(fileList.value[0].raw as File).then((base64) => {
+    const info = new UserInfo
+    // 抹去编码后字符串的头部
+    base64 = base64.replace('data:image/png;base64,', '')
+    console.log(base64)
+    info.setFaceImage(base64 as string)
+    return FaceRpc.Register(info)
+  })
+    .then((resp) => {
+      console.log(resp)
+    },
+      (err: RpcError) => {
+        Message(err.message)
+      })
+}
 
 const testRPC = () => {
   FaceRpc.Recognize('')
