@@ -1,26 +1,29 @@
 <template>
   <el-container class="host">
-      <el-header>
-        <div class="header">
-          <el-button text>主页</el-button>
-          <el-button text>注册</el-button>
-          <el-button text>登录</el-button>
+    <el-header>
+      <div class="header">
+        <div class="left-container">
+          <el-text class="mx-1" size="large">注册用户</el-text>
         </div>
-      </el-header>
+        <div class="right-container">
+          <el-button text>关于</el-button>
+        </div>
+      </div>
+    </el-header>
 
-      <el-main>
-        <div class="main">
-          <el-form ref="ruleFormRef" style="max-width: 200px" :model="ruleForm" status-icon
-           :rules="rules" label-width="auto" class="demo-ruleForm">
+    <el-main>
+      <div class="main">
+        <el-form ref="ruleFormRef" style="max-width: 300px" :model="ruleForm" status-icon
+          :rules="rules" label-width="auto" class="demo-ruleForm">
           <el-form-item label="姓名" prop="name">
-            <el-input v-model="ruleForm.name" required></el-input>
+            <el-input v-model="ruleForm.name" required size="large"></el-input>
           </el-form-item>
           <el-form-item label="邮箱" prop="email">
-            <el-input v-model="ruleForm.email" required></el-input>
+            <el-input v-model="ruleForm.email" required size="large"></el-input>
           </el-form-item>
           <el-form-item label="上传图片">
             <el-upload v-model:file-list="fileList" class="upload-demo"
-                 :on-change="uploadChange" :auto-upload="false" :limit="1">
+                  :on-change="uploadChange" :auto-upload="false" :limit="1">
               <template v-slot:trigger>
                 <el-button type="warning" size="middle">选取文件</el-button>
               </template>
@@ -30,8 +33,22 @@
             <el-button style="margin: 0 auto;" type="primary" @click="register">注册</el-button>
           </el-form-item>
         </el-form>
+        <!-- 图片显示框 -->
+        <div class="image-preview" v-if="!imageBase64">
+          <div class="image-placeholder">
+            <span>请上传图片</span>
+          </div>
         </div>
-      </el-main>
+        <div v-if="imageBase64" class="image-preview">
+          <el-image
+            style="width: 100%; height: auto;"
+            :src="imageBase64"
+            alt="上传的图片"
+            fit="contain">
+          </el-image>
+        </div>
+      </div>
+    </el-main>
   </el-container>
 </template>
 
@@ -119,15 +136,17 @@ const register = () => {
     // 调用后端进行注册
     console.log(`准备上传图片，姓名：${ruleForm.name}, 邮箱：${ruleForm.email}`)
 
-    // 通过 FaceRpc 注册用户
+    // 调用后端进行注册
     return FaceRpc.Register(userInfo)
   })
     .then((resp) => {
       console.log(resp)
-    },
-      (err: RpcError) => {
-        Message(err.message)
-      })
+      ElMessage.success('注册成功')
+    })
+    .catch((err: RpcError) => {
+      console.error(err)
+      ElMessage.error(`注册失败: ${err.message}`)
+    })
 }
 
 const ruleFormRef = ref<FormInstance>()
@@ -194,10 +213,22 @@ body{
 
 .header {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
   background-color: rgba(255, 255, 255,0.85);
   border-radius: 20px;
+}
+
+.right-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.mx-1{
+  font-weight: bold;
+  border-radius: 20px;
+  padding: 10px 20px;
+  margin: 10px;
 }
 
 .el-button {
@@ -207,9 +238,43 @@ body{
 }
 
 .main{
-  border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px; /* 给表单和图片框之间添加间距 */
+  flex-wrap: wrap; /* 保证在小屏幕下能自适应换行 */
   padding: 20px;
+  border-radius: 20px;
   background-color:rgba(255, 255, 255,0.85);
+  flex-direction: row;
+}
+
+/* 图片预览框样式 */
+.image-preview {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #ccc5c5;
+  max-width: 100%;
+  width: 400px; /* 固定宽度 */
+  height: 400px; /* 固定高度 */
+  margin-left: 100px; /* 保证与表单右侧有一定间距 */
+  background-color: transparent !important; /* 强制设置为透明 */
+}
+
+/* 图片占位框 */
+.image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #ccc5c5;
+  border-radius: 20px;
+  background-color: transparent !important; /* 强制设置为透明 */
 }
 </style>
 
