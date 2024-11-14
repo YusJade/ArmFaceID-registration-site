@@ -90,10 +90,16 @@ const getBase64 = (fileRaw: File) => {
 }
 
 const register = () => {
+  if (fileList.value.length == 0) {
+    Message('人脸图片不能为空')
+  }
   getBase64(fileList.value[0].raw as File).then((base64) => {
     const info = new UserInfo
     // 抹去编码后字符串的头部
-    base64 = base64.replace('data:image/png;base64,', '')
+
+    const regex = /^data:image\/[a-zA-Z0-9]+;base64,/;
+    base64 = base64.replace(regex, '')
+
     console.log(base64)
     info.setFaceImage(base64 as string)
     return FaceRpc.Register(info)
@@ -107,16 +113,18 @@ const register = () => {
 }
 
 const testRPC = () => {
-  FaceRpc.Recognize('')
   const userInfo = new UserInfo();
   userInfo.setEmail('test@email.com')
   userInfo.setUserName('testPerson')
   userInfo.setFaceImage(imageBase64.value as string)
   // TODO: MsgBox
+
   console.log(`准备上传图片 ${fileList.value[0]}`)
-  getUint8Array(fileList.value[0].raw as File).then((arr) => {
+  getBase64(fileList.value[0].raw as File).then((str) => {
+    str = str.replace('data:image/png;base64,', '')
     // 记得 return
-    return FaceRpc.Recognize(arr)
+    console.log(`remove header: ${str}`)
+    return FaceRpc.Recognize(str)
   })
     .then((resp: RecognitionResponse | null) => {
       Message(`${resp?.getRes.name}，欢迎你`)

@@ -3,6 +3,7 @@
 import {FaceRpcClient} from 'face-grpc/face_grpc_web_pb'
 import {UserInfo, RecognitionRequest, RecognitionResponse, RegistrationRequest, RegistrationResponse} from 'face-grpc/face_pb'
 import type { RpcError } from 'grpc-web';
+import process from 'process';
 
 /**
  * 用于调用 gRPC 后端服务器的接口
@@ -53,7 +54,9 @@ class FaceRpc {
 }
 
 // 连接后端服务器
-const FaceService = new FaceRpcClient('http://www.yusjade.world:9092', null, null)
+/* 'http://www.yusjade.world:9092' */ 
+console.log(process.env)
+const FaceService = new FaceRpcClient('http://192.168.3.18:9092', null, null)
 
 export default new FaceRpc(FaceService)
 export { UserInfo, RecognitionRequest, RecognitionResponse, RegistrationRequest, RegistrationResponse}

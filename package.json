@@ -21,6 +21,7 @@
     "google-protobuf": "^3.21.4",
     "grpc-web": "^1.5.0",
     "pinia": "^2.2.4",
+    "process": "^0.11.10",
     "ts-protoc-gen": "^0.15.1-pre.a71b34e",
     "vue": "^3.5.12",
     "vue-easy-lightbox": "^1.19.0",
@@ -29,7 +30,7 @@
   },
   "devDependencies": {
     "@tsconfig/node20": "^20.1.4",
-    "@types/node": "^20.17.3",
+    "@types/node": "^20.17.6",
     "@vitejs/plugin-vue": "^5.1.4",
     "@vue/eslint-config-prettier": "^10.0.0",
     "@vue/eslint-config-typescript": "^14.1.1",
