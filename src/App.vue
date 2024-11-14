@@ -3,6 +3,7 @@ import { RouterLink, RouterView } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
 
 import RegisterView from './views/RegisterView.vue'
+import test_register from './views/test_register.vue';
 </script>
 
 <template>
@@ -18,7 +19,7 @@ import RegisterView from './views/RegisterView.vue'
       </nav>
     </div>
   </header> -->
-  <RegisterView></RegisterView>
+  <test_register></test_register>
   <!-- <RouterView /> -->
 </template>
 

@@ -53,7 +53,7 @@ class FaceRpc {
 }
 
 // 连接后端服务器
-const FaceService = new FaceRpcClient('http://www.yusjade.world:9092', null, null)
+const FaceService = new FaceRpcClient('http://127.0.0.1:9092', null, null)
 
 export default new FaceRpc(FaceService)
 export { UserInfo, RecognitionRequest, RecognitionResponse, RegistrationRequest, RegistrationResponse}
