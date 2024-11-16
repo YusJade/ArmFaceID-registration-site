@@ -2,8 +2,8 @@
 import { RouterLink, RouterView } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
 
-import RegisterView from './views/RegisterView.vue'
-import test_register from './views/test_register.vue';
+import RegisterView from './views/mobile/RegisterView.vue'
+import test_register from './views/RegisterView.vue';
 </script>
 
 <template>
@@ -19,11 +19,22 @@ import test_register from './views/test_register.vue';
       </nav>
     </div>
   </header> -->
-  <test_register></test_register>
-  <!-- <RouterView /> -->
+  <!-- <test_register></test_register> -->
+  <RouterView />
 </template>
 
-<style scoped>
+<style>
+@import './assets/font/font.css';
+
+#app {
+  font-family: "Source Code Pro", "思源宋体";
+  font-weight: bold;
+}
+
+button {
+  font-family: "Source Code Pro", "思源宋体";
+}
+
 header {
   line-height: 1.5;
   max-height: 100vh;
