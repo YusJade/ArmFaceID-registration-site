@@ -24,7 +24,7 @@
       <img
            src="https://contrib.rocks/image?repo=YusJade/ArmFaceID-registration-site&name=true" />
     </a>
-    <p>感谢贡献~🩷</p>
+    <p>感谢贡献~ ❤</p>
   </div>
   <el-footer class="footer">
     <p>项目仓库🫱</p>
