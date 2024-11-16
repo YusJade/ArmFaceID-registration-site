@@ -1,0 +1,121 @@
+<template>
+  <div
+       style="min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; background-color: var(--background); color: var(--foreground);">
+    <div style="padding: 1rem; background-color: var(--primary); margin-top: 0;">
+      <h1 style="font-size: 1.5rem; font-weight: 700;">留言板</h1>
+    </div>
+    <InfiniteList :data="testMsgs" :width="'100%'" :height="600" :itemSize="100"
+                  :scrollToIndex="scrollToIndex" v-slot="{ item, index }">
+      <div style="margin-bottom: 0.3rem;">
+        <div style="display: flex; align-items: center; margin-bottom: 0.5rem;">
+          <img style="width: 4rem; height: 4rem; border-radius: 50%;"
+               src="https://placehold.co/50x50" alt="用户头像" />
+          <div style="margin-left: 1rem;">
+            <p style="font-size: 0.75rem; margin: 0 auto;">2小时前</p>
+            <div style="font-size: 0.75rem; margin-top: 0.6rem;">{{ item.msg }}</div>
+          </div>
+        </div>
+      </div>
+    </InfiniteList>
+    <div style="padding: 1rem; background-color: var(--primary);">
+      <div style="display: flex;">
+        <input type="text" placeholder="在这里输入您的留言"
+               style="flex: 1; padding: 0.5rem; margin-right: 0.5rem; background-color: var(--input); color: var(--foreground); border-radius: 0.5rem;" />
+        <button
+                style="background-color: var(--primary); color: var(--foreground); padding: 0.5rem 1rem; border-radius: 0.5rem;">发送</button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue';
+import InfiniteList from 'vue3-infinite-list'
+
+
+
+// 响应式数据
+const scrollToIndex = ref(0);
+
+// 启动计时器
+let timer;
+
+// 每秒自增 scrollToIndex
+const startTimer = () => {
+  // 清除之前的定时器，以防止重复启动
+  if (timer) {
+    clearInterval(timer);
+  }
+
+  timer = setInterval(() => {
+    scrollToIndex.value++;
+    scrollToIndex.value = scrollToIndex.value % testMsgs.value.length
+  }, 1000); // 每秒钟自增一次
+};
+
+startTimer()
+
+// 组件卸载时清除定时器
+// onBeforeUnmount(() => {
+//   if (timer) {
+//     clearInterval(timer);
+//   }
+// });
+
+
+// export 后子组件才能解析
+export interface MessageItem {
+  date: string,
+  msg: string,
+}
+const testMsgs = ref<Array<MessageItem>>([
+  { date: "2024年11月15日21点59分", msg: "Vue 3 的响应式系统好像比 Vue 2 快很多啊，感觉性能提升了不少！" },
+  { date: "2024年11月15日22点00分", msg: "确实，特别是在大型应用中，反应速度和流畅度提升很明显。" },
+  { date: "2024年11月15日22点01分", msg: "但是我在尝试 Composition API 时，代码的结构变得有点复杂，大家有类似的感受吗？" },
+  { date: "2024年11月15日22点03分", msg: "是的，最开始接触 Composition API 时会觉得有点乱，特别是多个 `ref` 和 `reactive` 混合使用时。" },
+  { date: "2024年11月15日22点05分", msg: "不过，等适应了之后，写起来就比以前的选项式 API 更加灵活了，尤其是对于大型项目。" },
+  { date: "2024年11月15日22点06分", msg: "对了，Vue 3 的 `v-model` 改动也很大，大家有没有遇到问题？" },
+  { date: "2024年11月15日22点08分", msg: "是啊，现在的 `v-model` 变得更简洁，支持多个绑定值。但有时候我会忘记加 `.sync`，搞得有点麻烦。" },
+  { date: "2024年11月15日22点10分", msg: "我觉得 Vue 3 的 `teleport` 组件很强大，做模态框和弹窗时能有效解决 DOM 层级问题。" },
+  { date: "2024年11月15日22点12分", msg: "对，`teleport` 确实能帮我们解决很多布局问题，尤其是全局弹窗之类的。" },
+  { date: "2024年11月15日22点13分", msg: "我最近在用 Vue 3 写项目，感觉 `Suspense` 也挺不错的，能更好地处理异步加载。" },
+  { date: "2024年11月15日22点15分", msg: "是的，`Suspense` 使得异步加载的组件渲染更加平滑，特别适合动态加载页面内容。" },
+  { date: "2024年11月15日22点16分", msg: "我觉得 Vue 3 还不错，但如何优化大型项目的性能呢？有没有什么推荐的做法？" },
+  { date: "2024年11月15日22点18分", msg: "我建议可以使用 `keep-alive` 来缓存组件，减少不必要的渲染，尤其是在切换页面时。" },
+  { date: "2024年11月15日22点19分", msg: "另外，Vue 3 中的 `suspense` 和 `lazy loading` 也能在性能优化上起到很大作用。" },
+  { date: "2024年11月15日22点20分", msg: "Vue 3 支持自定义指令的地方也很方便，能更好地解决一些 UI 组件的定制需求。" },
+  { date: "2024年11月15日22点22分", msg: "是的，特别是当需要处理一些复杂的 DOM 操作时，自定义指令可以极大简化代码。" },
+  { date: "2024年11月15日22点23分", msg: "关于 Vue 3 的 `provide` 和 `inject`，我觉得这两个 API 用得比较多。大家觉得如何？" },
+  { date: "2024年11月15日22点25分", msg: "我认为它们是 Vue 中非常强大的功能，尤其是在跨组件通信方面，但如果使用不当，可能会导致数据流失控。" },
+  { date: "2024年11月15日22点26分", msg: "Vue 3 的 Composition API 让我更容易理解和维护复杂的逻辑，特别是在大型应用中。" },
+  { date: "2024年11月15日22点28分", msg: "对，特别是结合 TypeScript 使用时，类型推导也非常好，减少了很多出错的可能性。" },
+  { date: "2024年11月15日22点30分", msg: "Vue 3 和 TypeScript 配合的体验真的是提升了不少，尤其是自动补全和类型检查。" },
+  { date: "2024年11月15日22点31分", msg: "但是在小型项目中，有时候觉得使用 Vue 3 会有些过于复杂，Vue 2 的 API 更加简洁。" },
+  { date: "2024年11月15日22点33分", msg: "我觉得 Vue 3 在大型项目中优势更明显，特别是代码可维护性和灵活性。" },
+  { date: "2024年11月15日22点34分", msg: "你们有没有遇到过 Vue 3 的性能问题？比如在大量数据渲染时，卡顿很严重。" },
+  { date: "2024年11月15日22点36分", msg: "我觉得可以通过 `v-for` 中的 `key` 来优化渲染，减少不必要的 DOM 更新。" },
+  { date: "2024年11月15日22点37分", msg: "还有就是避免使用过多的 `watch`，尽量让状态保持在 Vue 组件内部，而不是暴露在外部。" },
+  { date: "2024年11月15日22点38分", msg: "另外，使用 `Vuex` 状态管理时，可以分模块管理，每个模块只管理自己的状态。" },
+  { date: "2024年11月15日22点39分", msg: "我有个疑问，Vue 3 的 `watch` 和 `computed` 到底有什么区别？" },
+  { date: "2024年11月15日22点40分", msg: "简单来说，`computed` 是基于依赖的缓存值，而 `watch` 是观察一个值变化并执行副作用。" },
+  { date: "2024年11月15日22点42分", msg: "听说 Vue 3 支持自动化构建工具，像是 Vite，我觉得它的启动速度确实很快。" },
+  { date: "2024年11月15日22点44分", msg: "是的，Vite 基于 ESBuild，能够大幅提高开发环境的构建速度，极大提升开发体验。" },
+  { date: "2024年11月15日22点45分", msg: "Vite 的热更新也非常快，几乎瞬时刷新，能提升开发时的效率。" },
+  { date: "2024年11月15日22点46分", msg: "Vue 3 有些新的 API 需要学习成本，特别是对 Vue 2 的开发者，可能需要一段时间来适应。" },
+  { date: "2024年11月15日22点47分", msg: "不过 Vue 3 的优势在于更好的性能和更强的灵活性，值得去学习和适应。" },
+  { date: "2024年11月15日22点49分", msg: "对了，Vue 3 的 `defineComponent` 使得组件的定义变得更加清晰和规范化。" },
+  { date: "2024年11月15日22点50分", msg: "是的，它显得更加正式，能帮助我们更好地维护大型项目中的类型和结构。" },
+  { date: "2024年11月15日22点51分", msg: "我发现 Vue 3 还引入了更强的类型推导，特别是在使用 `ref` 和 `reactive` 时，感觉更准确了。" },
+  { date: "2024年11月15日22点53分", msg: "有没有人试过 Vue 3 的新的 `router` 配置方式，感觉比 Vue 2 简洁多了？" },
+  { date: "2024年11月15日22点54分", msg: "是的，Vue 3 的 `router` 使用了新的 API，配置起来更简洁，代码也更容易理解。" },
+  { date: "2024年11月15日22点55分", msg: "我觉得 Vue 3 对于 TypeScript 的支持真是越来越好，编写代码的体验变得更好。" },
+  { date: "2024年11月15日22点56分", msg: "是的，尤其是在 IDE 中，Vue 3 可以提供更好的类型推导和智能提示，帮助开发者减少错误。" },
+])
+
+
+</script>
+
+
+<style>
+@import '@/assets/common.css'
+</style>

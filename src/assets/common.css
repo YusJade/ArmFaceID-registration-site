@@ -1,0 +1,24 @@
+.li-con {
+  padding: 0 10px;
+  line-height: 50px;
+  color: #333;
+  box-sizing: border-box;
+  border-bottom: 1px solid #ddd;
+}
+
+.disabled-button {
+  width: 100%;
+  height: 50px;
+  font-size: 16px;
+  font-weight: 700;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  background-image: -webkit-linear-gradient(0deg, #676E6E, #E0E0D6);
+  color: #ffffff;
+  position: relative;
+  cursor: pointer;
+  z-index: 0;
+  transition: all 0.4s;
+  /* animation: flyColor 0.6s ease-in; */
+}
