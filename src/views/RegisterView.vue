@@ -71,13 +71,13 @@
     </el-main>
     <el-footer class="footer">
       <p>项目仓库🫱</p>
-      <img style="width: 1%;" src="../assets/github-mark.svg" />
+      <img style="width: 1%;" src="@/assets/github-mark.svg" />
       <a style="color: #8B94EBFF;"
          href="https://github.com/YusJade/ArmFaceID">YusJade/ArmFaceID</a><br />
-      <img style="width: 1%;" src="../assets/github-mark.svg" />
+      <img style="width: 1%;" src="@/assets/github-mark.svg" />
       <a style="color: #8B94EBFF;"
          href="https://github.com/YusJade/ArmFaceID-registration-site">YusJade/ArmFaceID-registration-site</a><br />
-      <img style="width: 1%;" src="../assets/github-mark.svg" />
+      <img style="width: 1%;" src="@/assets/github-mark.svg" />
       <a style="color: #8B94EBFF;"
          href="https://github.com/YusJade/ArmFaceID-client">YusJade/ArmFaceID-client</a>
     </el-footer>
@@ -90,32 +90,27 @@
     <!-- <MessageBorad></MessageBorad> -->
     <h2>留言板</h2>
     <p>欢迎在这里留言！(●'◡'●)</p>
-    <MessageBoard :data="messageBoardContent" title="" v-slot="{ item, index }">
+    <MessageBoard title="" v-slot="{ item, index }">
       <div style="display: flex; align-items: center; padding-top: 0%;">
         <img style="width: 3.7rem; height: 3.7rem; border-radius: 50%; margin-top: 0.3rem"
              :src="getAssetsFile(images[randomNum(0, 1000) % 7])" alt="用户头像" />
         <div style="margin-left: 1rem;">
           <p style="font-size: 0.75rem; margin-top: 0.3rem; margin-bottom: 0;">
-            {{ messageBoardContent[index].Datetime }}</p>
+            {{ timeAgo(item.Datetime) }}</p>
           <div style="font-size: 0.75rem; margin-top: 0.1rem;">{{
-            messageBoardContent[index].Content }}
+            item.Content }}
           </div>
         </div>
       </div>
     </MessageBoard>
-    <el-form>
-      <div style="display: flex;">
-        <el-form-item style="width: 60%; margin-left: 10%; ">
-          <el-input type="text" placeholder="在这里输入您的留言" size="large" v-model="msgInput"
-                    style="width: 100%; height: 40px;" />
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" size="large" @click="onSendButtonClicked"
-                     style="height: 40px; border-radius: 8%;"
-                     :disabled="!enableSendMsgBtn" plain color="#40E2A6">发送</el-button>
-        </el-form-item>
-      </div>
-    </el-form>
+    <el-footer class="footer">
+      <p>留言板 Powered By</p>
+      <img style="width: 5%;" src="../assets/github-mark.svg" />
+      <img style="width: 5%;" src="../assets/golang-svgrepo-com.svg" />
+      <a style="color: #8B94EBFF;"
+         href="https://github.com/YusJade/gomessage-board">YusJade/gomessage-board:</a><br />
+      <p style="margin-top: 0%; color: gray;">使用Go + gin + openapi的留言板服务端应用</p>
+    </el-footer>
   </el-drawer>
 </template>
 
@@ -133,11 +128,11 @@ import { StatusCode, type RpcError } from 'grpc-web'
 import { type MessageItem } from '@/type'
 import { testMsgs } from '@/test'
 import { randomNum } from '@/utils/random'
-import { getAssetsFile } from '@/utils/pub-use'
+import { getAssetsFile, timeAgo } from '@/utils/pub-use'
 import { getMessageBoard, writeMessageBoard } from '@/https'
 
 const enableBtn = ref(false)
-const enableSendMsgBtn = ref(true)
+
 
 
 const images = ref([
@@ -160,64 +155,6 @@ const images = ref([
 //   getAssetsFile("chat_6.jpg"),
 //   getAssetsFile("chat_7.jpg"),
 // ])
-
-onMounted(() => {
-  attainMsg();
-  // const interval = setInterval(() => {
-  //   attainMsg();
-  // }, 10000); // 每 10 秒调用一次
-
-  // onUnmounted(() => {
-  //   clearInterval(interval);
-  // });
-});
-
-// 组件卸载时清除定时器
-
-
-const msgInput = ref<string>('')
-const messageBoardContent = ref<Array<MessageItem>>([])
-const attainMsg = () => {
-  getMessageBoard()
-    .then(resp => {
-      if (resp.data) {
-        const res = resp.data
-        while (messageBoardContent.value.length > 0) {
-          messageBoardContent.value?.pop()
-        }
-
-        res.forEach(e => {
-          messageBoardContent.value.push(e)
-        })
-      }
-    })
-    .catch(err => {
-      ElMessage.error('留言板服务不可用')
-      console.log(err)
-    })
-}
-
-const onSendButtonClicked = () => {
-  if (msgInput.value?.trim() == '') {
-    ElMessage.warning('文本不能为空')
-    return
-  }
-  enableSendMsgBtn.value = false
-  writeMessageBoard(msgInput.value.trim())
-    .then(resp => {
-      if (resp.status == 200)
-        ElMessage.success('感谢留言')
-      enableSendMsgBtn.value = true
-      msgInput.value = ''
-    })
-    .catch(err => {
-      ElMessage.error('服务器错误')
-      console.log(err)
-      enableSendMsgBtn.value = true
-    })
-  attainMsg()
-}
-
 
 const fileList = ref<UploadUserFile[]>([
 ])
@@ -328,11 +265,11 @@ const register = () => {
     })
     .catch((err: RpcError) => {
       console.error(err)
-      let errMsg = "内部错误"
       if (err.code == StatusCode.UNKNOWN) {
-        errMsg = "服务不可用"
+        ElMessage.error(`服务不可用`)
+      } else {
+        ElMessage.error(`${err.message}`)
       }
-      ElMessage.error(`注册失败，${errMsg}`)
     })
   enableBtn.value = true
 }
