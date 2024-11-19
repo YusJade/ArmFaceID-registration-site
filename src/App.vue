@@ -1,9 +1,5 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
-
-import RegisterView from './views/mobile/RegisterView.vue'
-import test_register from './views/RegisterView.vue';
 </script>
 
 <template>

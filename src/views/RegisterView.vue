@@ -70,13 +70,16 @@
       </div>
     </el-main>
     <el-footer class="footer">
-      <p>since 2024.</p>
+      <p>项目仓库🫱</p>
       <img style="width: 1%;" src="../assets/github-mark.svg" />
       <a style="color: #8B94EBFF;"
-         href="https://github.com/YusJade/SpringBoot-MyBatis-Example">YusJade/ArmFaceID</a><br />
+         href="https://github.com/YusJade/ArmFaceID">YusJade/ArmFaceID</a><br />
       <img style="width: 1%;" src="../assets/github-mark.svg" />
       <a style="color: #8B94EBFF;"
-         href="https://github.com/YusJade/SpringBoot-MyBatis-DBDesign">YusJade/ArmFaceID-registration</a>
+         href="https://github.com/YusJade/ArmFaceID-registration-site">YusJade/ArmFaceID-registration-site</a><br />
+      <img style="width: 1%;" src="../assets/github-mark.svg" />
+      <a style="color: #8B94EBFF;"
+         href="https://github.com/YusJade/ArmFaceID-client">YusJade/ArmFaceID-client</a>
     </el-footer>
   </el-container>
 
@@ -86,30 +89,38 @@
   <el-drawer v-model="drawerChat" title="留言板" :with-header="false">
     <!-- <MessageBorad></MessageBorad> -->
     <h2>留言板</h2>
-    <p>或许可以在这里写点什么？🧐😶‍🌫️</p>
-    <MessageBoard :data="doubleMsgs" title="" v-slot="{ item, index }">
+    <p>欢迎在这里留言！(●'◡'●)</p>
+    <MessageBoard :data="messageBoardContent" title="" v-slot="{ item, index }">
       <div style="display: flex; align-items: center; padding-top: 0%;">
         <img style="width: 3.7rem; height: 3.7rem; border-radius: 50%; margin-top: 0.3rem"
-             :src="images[index % 2]" alt="用户头像" />
+             :src="getAssetsFile(images[randomNum(0, 1000) % 7])" alt="用户头像" />
         <div style="margin-left: 1rem;">
-          <p style="font-size: 0.75rem; margin-top: 0.3rem; margin-bottom: 0;">2小时前</p>
-          <div style="font-size: 0.75rem; margin-top: 0.1rem;">{{ item.msg }}</div>
+          <p style="font-size: 0.75rem; margin-top: 0.3rem; margin-bottom: 0;">
+            {{ messageBoardContent[index].Datetime }}</p>
+          <div style="font-size: 0.75rem; margin-top: 0.1rem;">{{
+            messageBoardContent[index].Content }}
+          </div>
         </div>
       </div>
     </MessageBoard>
-    <div style="padding: 1rem; background-color: var(--primary);">
+    <el-form>
       <div style="display: flex;">
-        <el-input type="text" placeholder="在这里输入您的留言" size="large"
-                  style="flex: 1; padding: 0.5rem; background-color: var(--input); color: var(--foreground); border-radius: 0.5rem;" />
-        <el-button type="primary" size="large"
-                   style="padding: 1rem 1.6rem; border-radius: 10px;">发送</el-button>
+        <el-form-item style="width: 60%; margin-left: 10%; ">
+          <el-input type="text" placeholder="在这里输入您的留言" size="large" v-model="msgInput"
+                    style="width: 100%; height: 40px;" />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" size="large" @click="onSendButtonClicked"
+                     style="height: 40px; border-radius: 8%;"
+                     :disabled="!enableSendMsgBtn" plain color="#40E2A6">发送</el-button>
+        </el-form-item>
       </div>
-    </div>
+    </el-form>
   </el-drawer>
 </template>
 
 <script setup lang="ts">
-import { defineComponent, ref, reactive, computed, onMounted } from 'vue'
+import { defineComponent, ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import FaceRpc, { RecognitionResponse } from '@/client/client'
 import { UserInfo, RecognitionRequest } from '@/client/client'
@@ -119,32 +130,92 @@ import MessageBoard from '@/components/MessageBoard.vue'
 import type { UploadProps, UploadUserFile, UploadFiles, UploadFile } from 'element-plus'
 import { Message } from '@/utils/message'
 import { StatusCode, type RpcError } from 'grpc-web'
-import { type MessageItem } from '@/http'
+import { type MessageItem } from '@/type'
 import { testMsgs } from '@/test'
-import { rejects } from 'assert'
+import { randomNum } from '@/utils/random'
+import { getAssetsFile } from '@/utils/pub-use'
+import { getMessageBoard, writeMessageBoard } from '@/https'
 
 const enableBtn = ref(false)
+const enableSendMsgBtn = ref(true)
+
 
 const images = ref([
-  "src/assets/chat_1.png",
-  "src/assets/chat_2.jpg",
+  "chat_1.png",
+  "chat_2.jpg",
+  "chat_3.jpg",
+  "chat_4.jpg",
+  "chat_5.jpg",
+  "chat_6.jpg",
+  "chat_7.jpg",
 ])
 
+/// 无法在scirpt使用
+// const images = ref([
+//   getAssetsFile("chat_1.png"),
+//   getAssetsFile("chat_2.jpg"),
+//   getAssetsFile("chat_3.jpg"),
+//   getAssetsFile("chat_4.jpg"),
+//   getAssetsFile("chat_5.jpg"),
+//   getAssetsFile("chat_6.jpg"),
+//   getAssetsFile("chat_7.jpg"),
+// ])
 
-const doubleMsgs = computed(() => {
-  return testMsgs.value.concat(testMsgs.value)
-})
+onMounted(() => {
+  attainMsg();
+  // const interval = setInterval(() => {
+  //   attainMsg();
+  // }, 10000); // 每 10 秒调用一次
+
+  // onUnmounted(() => {
+  //   clearInterval(interval);
+  // });
+});
+
+// 组件卸载时清除定时器
 
 
-// 发送留言板信息
-// TODO: 限制高频率发送
-const sendMsg = () => {
+const msgInput = ref<string>('')
+const messageBoardContent = ref<Array<MessageItem>>([])
+const attainMsg = () => {
+  getMessageBoard()
+    .then(resp => {
+      if (resp.data) {
+        const res = resp.data
+        while (messageBoardContent.value.length > 0) {
+          messageBoardContent.value?.pop()
+        }
 
+        res.forEach(e => {
+          messageBoardContent.value.push(e)
+        })
+      }
+    })
+    .catch(err => {
+      ElMessage.error('留言板服务不可用')
+      console.log(err)
+    })
 }
 
-// 轮询留言板信息
-const getMsg = () => {
-
+const onSendButtonClicked = () => {
+  if (msgInput.value?.trim() == '') {
+    ElMessage.warning('文本不能为空')
+    return
+  }
+  enableSendMsgBtn.value = false
+  writeMessageBoard(msgInput.value.trim())
+    .then(resp => {
+      if (resp.status == 200)
+        ElMessage.success('感谢留言')
+      enableSendMsgBtn.value = true
+      msgInput.value = ''
+    })
+    .catch(err => {
+      ElMessage.error('服务器错误')
+      console.log(err)
+      enableSendMsgBtn.value = true
+    })
+  attainMsg()
 }
 
 
@@ -245,7 +316,7 @@ const register = () => {
 
     // 调用后端进行注册
     console.log(`准备上传图片，姓名：${ruleForm.name}, 邮箱：${ruleForm.email}`)
-
+    enableBtn.value = false
     // 调用后端进行注册
     return FaceRpc.Register(userInfo)
   })
@@ -263,6 +334,7 @@ const register = () => {
       }
       ElMessage.error(`注册失败，${errMsg}`)
     })
+  enableBtn.value = true
 }
 
 const ruleFormRef = ref<FormInstance>()

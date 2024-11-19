@@ -17,6 +17,7 @@
     "@grpc/proto-loader": "^0.7.13",
     "@improbable-eng/grpc-web": "^0.15.0",
     "@types/google-protobuf": "^3.15.12",
+    "axios": "^1.7.7",
     "element-plus": "^2.8.6",
     "google-protobuf": "^3.21.4",
     "grpc-web": "^1.5.0",

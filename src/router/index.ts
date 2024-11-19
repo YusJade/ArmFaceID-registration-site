@@ -4,7 +4,7 @@ const routesPC = [
   {
     path: '/',
     name: 'register',
-    component: () => import('../views/RegisterView.vue'),
+    component: () => import('@/views/RegisterView.vue'),
   },
 ]
 
@@ -12,7 +12,7 @@ const routesM = [
   {
     path: '/',
     name: 'register',
-    component: () => import('../views/mobile/RegisterViewM.vue'),
+    component: () => import('@/views/mobile/RegisterViewM.vue'),
   },
 ]
 

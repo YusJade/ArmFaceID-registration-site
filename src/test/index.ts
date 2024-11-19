@@ -1,4 +1,4 @@
-import {type MessageItem} from '@/http'
+import {type MessageItem} from '@/type'
 import { ref } from 'vue'
 
 export const testMsgs = ref<Array<MessageItem>>([
